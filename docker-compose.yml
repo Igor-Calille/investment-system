@@ -1,0 +1,49 @@
+version: '3.8'
+services:
+  api-gateway:
+    build: ./api-gateway
+    ports:
+      - "8080:8080"
+    environment:
+      -AUTH_SERVER_URL=http://auth-service:8001
+      -Investment_URL=http://investment-service:8002
+    depends_on:
+      -auth-service
+      -investment-service
+    
+  auth-service:
+    build: ./auth-service
+    ports:
+      - "8001:8000"
+    environment:
+      - DATABASE_URL=postgresql://auth_user:password@auth-db/auth_db
+    depends_on:
+      -auth-db
+
+  
+  auth-db:
+    image: postgres
+    environment:
+      - POSTGRES_USER=auth_user
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=auth_db
+    ports:
+      - "5432:5432"
+
+  investment-service:
+    build: ./investment-service
+    ports:
+      - "8002:8000"
+    environment:
+      - DATABASE_URL=postgresql://investment_user:password@investment-db/investment_db
+    depends_on:
+      - investment-db
+  
+  investment-db:
+      image: postgre
+      environment:
+        - POSTGRES_USER=investment_user
+        - POSTGRES_PASSWORD=password
+        - POSTGRES_DB=investment_db
+      ports:
+        - "5433:5432"
